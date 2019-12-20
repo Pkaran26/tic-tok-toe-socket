@@ -1,0 +1,11 @@
+export const CONNECTION = 'connect'
+export const DISCONNECT = 'disconnect'
+export const NEW_USER = 'NEW_USER'
+export const ONLINE_USERS = 'ONLINE_USERS'
+
+export const LOGGEDIN = 'LOGGEDIN'
+export const OPPONENT = 'OPPONENT'
+export const CHECK_OPPONENT = 'CHECK_OPPONENT'
+export const ON_MOVE = 'ON_MOVE'
+export const GAME_HISTORY = 'GAME_HISTORY'
+export const UNLOCK = 'UNLOCK'
