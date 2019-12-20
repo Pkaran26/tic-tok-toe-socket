@@ -21,8 +21,6 @@ class App extends Component {
       })
     })
 
-
-
     this.socket.on(DISCONNECT, ()=>{
       this.setState({
         socket_id: ''
