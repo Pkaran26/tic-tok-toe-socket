@@ -30,7 +30,7 @@ class App extends Component {
 
   render(){
     return (
-      <div className="App">
+      <div className="App container" style={{marginTop: '50px'}}>
         {this.state.socket_id?
           <TikTokToe
             socket={this.socket}

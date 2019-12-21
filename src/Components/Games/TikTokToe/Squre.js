@@ -13,7 +13,7 @@ const Squre = ({ returnFunc, user, squreId, moves, gamePass })=>{
   }, [moves])
 
   const addMove = ()=>{
-    if(!clicked && gamePass){
+    if(gamePass){
       returnFunc(squreId, user)
       setClicked(true)
       setLogo(x_img)
@@ -22,7 +22,7 @@ const Squre = ({ returnFunc, user, squreId, moves, gamePass })=>{
 
   return(
     <td>
-      <button className="squre" onClick={addMove}>
+      <button disabled={ clicked } className="squre btn btn-info" onClick={addMove}>
         {clicked?
           <img src={logo} alt={squreId} />
         :null}

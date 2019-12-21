@@ -37,7 +37,7 @@ console.log('running...');
 io.sockets.on('connection', function(socket){
   connections.push(socket);
   console.log('Connected: ', connections.length);
-
+  updateUsers()
   //disconnected
   socket.on('disconnect', function(data){
     const index = connections.indexOf(socket);
@@ -48,10 +48,11 @@ io.sockets.on('connection', function(socket){
     console.log('Connected: ', connections.length);
   });
 
-  socket.on('NEW_USER', function(user){
+  socket.on('NEW_USER', function(user, callback){
     console.log(user);
     socket.username = user.username;
     availableUsers.push(user)
+    callback(true)
     updateUsers();
   });
 
