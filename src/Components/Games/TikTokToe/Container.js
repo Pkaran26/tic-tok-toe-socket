@@ -1,11 +1,26 @@
 import React from 'react'
 import Squre from './Squre'
 
-const Container = ({ setMove, sender, moves, gamePass })=>{
-
+const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent, userLeft })=>{
   return(
     <div className="card bg-light">
-      <div className="card-body text-center">
+      <div className="card-body">
+        <table style={{width: '100%'}}>
+          <tbody>
+            <tr>
+              <td>Welcome { sender.username }</td>
+              {!userLeft?
+                <td>{ opponent && opponent.username? `Opponent ${ opponent.username }` :
+                  <small className="text-danger"> Waiting for opponent</small>}
+                </td>
+              :
+              <td>
+                <small className="text-danger">Opponent left</small>
+              </td>
+              }
+            </tr>
+          </tbody>
+        </table>
         <table>
           <tbody>
           <tr>

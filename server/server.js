@@ -16,7 +16,7 @@ busyUsers = [];
 //   uuid: '',
 //   username: '',
 //   socket_id: '',
-//   yourMoves: []
+//   moves: []
 // }
 //
 // [
@@ -49,7 +49,6 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('NEW_USER', function(user, callback){
-    console.log(user);
     socket.username = user.username;
     availableUsers.push(user)
     callback(true)
@@ -59,16 +58,19 @@ io.sockets.on('connection', function(socket){
   function userLeft(socket_id){
     const user = returnUser(socket_id)
     if(user && user.length>0){
-      if(socket_id == user[0].player1.socket_id){
-        freeUser(user[0].player1);
-      }else if (socket_id == user[0].player2.socket_id) {
-        freeUser(user[0].player2);
+      for(let i=0;i<user.length;i++){
+        if(socket_id == user[i].player1.socket_id){
+          freeUser(user[i].player2);
+        }else if (socket_id == user[i].player2.socket_id) {
+          freeUser(user[i].player1);
+        }
+        busyUsers.splice(busyUsers.indexOf(user[i]));
       }
-      busyUsers.splice(busyUsers.indexOf(user[0]));
     }
   }
 
   function freeUser(user){
+    console.log("user ", user.username, "socket_id", user.socket_id);
     const message = {
       message: 'opponent left'
     }
@@ -114,8 +116,9 @@ io.sockets.on('connection', function(socket){
       const player2 = {
         status: true,
         message: 'success',
-        opponent: user,
-        gameId: gameId
+        opponent: opponent[0],
+        gameId: gameId,
+        moveToken: true
       }
       callback(player2)
     }else{
@@ -134,24 +137,31 @@ io.sockets.on('connection', function(socket){
   // }
 
   socket.on('ON_MOVE', function(data){
-    busyUsers[data.gameId].history.push(`${ data.your.username } clicked ${ data.move }`)
-    busyUsers[data.gameId].moves.push(data.move);
-    if(checkMoves(busyUsers[data.gameId], data.your.uuid)){
-      io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
-        message: 'you won',
-        reset: true
-      });
-      io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
-        message: `${ data.your.username } won`,
-        reset: true
-      });
-      return null;
-    }else {
+    busyUsers[data.gameId].gameHistory.history.push({
+      username: data.your.username,
+      move: data.move
+    })
+    //console.log(busyUsers[data.gameId]);
+    const player = checkPlayer(busyUsers[data.gameId], data.your.uuid)
+    busyUsers[data.gameId][player].moves.push(data.move);
+    busyUsers[data.gameId].gameHistory.moves.push(data.move);
+    const status = checkWinner(busyUsers[data.gameId][player])
+    console.log(status);
+    // if(checkMoves(busyUsers[data.gameId], data.your.uuid)){
+    //   io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
+    //     message: 'you won',
+    //     reset: true
+    //   });
+    //   io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
+    //     message: `${ data.your.username } won`,
+    //     reset: true
+    //   });
+    //   return null;
+    // }else {
       io.to(`${data.opponent.socket_id}`).emit('MOVE_TOKEN', {
-        moveToken: data.opponent.uuid
+        moveToken: true
       });
-    }
-
+  // }
 
     io.to(`${data.opponent.socket_id}`).emit('GAME_HISTORY', {
       gameHistory: busyUsers[data.gameId].gameHistory,
@@ -162,13 +172,13 @@ io.sockets.on('connection', function(socket){
     });
   });
 
-  function checkMoves(obj, uuid){
-    let flg = false;
+  function checkPlayer(obj, uuid){
     if(obj.player1.uuid == uuid){
-      flg = checkWinner(obj.player1)
+      return 'player1'
     }else if(obj.player2.uuid == uuid){
-      flg = checkWinner(obj.player2)
+      return 'player2'
     }
+    //flg = checkWinner(obj.player1)
     return flg
   }
 
@@ -184,8 +194,8 @@ io.sockets.on('connection', function(socket){
       [ 2,4,6 ]
     ];
 
-    const moves = user.yourMoves.sort();
-
+    const moves = user.moves.sort();
+    console.log(moves);
     for(let i = 0; i < possibleCombinations.length; i++){
       let match = [];
       let possible = possibleCombinations[i];
@@ -198,7 +208,7 @@ io.sockets.on('connection', function(socket){
               break;
             }
           }catch(e){
-
+            return false
           }
         }
       }

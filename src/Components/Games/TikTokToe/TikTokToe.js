@@ -20,27 +20,32 @@ class TikTokToe extends Component{
         socket_id: '',
         username: '',
         logo: x_img,
+        moves: [],
       },
       loggedIn: false,
+      gameId: '',
       opponent: '',
       gameHistory: [],
       moves: [],
       gamePass: false,
-
       onlineUsers: 0,
+      userLeft: ''
     }
     this.socket = null
   }
 
   setter = (key, value)=>{
-    const sender = {
-      ...this.state.sender,
-      [key]: value
-    }
     this.setState({
-      sender: sender
+      sender: {
+        ...this.state.sender,
+        [key]: value
+      }
     })
   }
+
+  // componentWillMount(){
+  //   this.setSender()
+  // }
 
   componentDidMount(){
     this.setSender()
@@ -54,26 +59,44 @@ class TikTokToe extends Component{
 
       })
       this.socket.on('OPPONENT_LEFT', (data)=>{
-
+        console.log(data.message);
+        this.setState({
+          userLeft: data.message,
+          opponent: ''
+        })
       })
       this.socket.on('OPPONENT_MATCHED', (data)=>{
-
+        if(data && data.status && !this.state.opponent){
+          this.setOpponent(data.opponent, data.gameId)
+        }
       })
       this.socket.on('GAME_HISTORY', (data)=>{
-
+        this.setState({
+          gameHistory: data.gameHistory,
+          moves: data.moves
+        })
       })
       this.socket.on('MOVE_TOKEN', (data)=>{
-
+        this.setState({
+          gamePass: data.moveToken
+        })
       })
       this.socket.on('GAME_WINNER', (data)=>{
-
+        console.log(data);
       })
     }
   }
 
   checkOpponent = ()=>{
-    this.socket.emit(CHECK_OPPONENT, (data)=>{
-
+    this.socket.emit(CHECK_OPPONENT, this.state.sender, (data)=>{
+      if(data && data.status && !this.state.opponent){
+        this.setOpponent(data.opponent, data.gameId)
+        this.setState({
+          gamePass: true
+        })
+      }else {
+        this.checkOpponent()
+      }
     })
   }
 
@@ -89,24 +112,35 @@ class TikTokToe extends Component{
     const { socket, socket_id } = this.props
     this.socket = socket
     const uuid = this.generateUUID()
-    this.setter("socket_id", socket_id)
-    this.setter("uuid", uuid)
-  }
-
-  setUser = (username)=>{
-    this.setter("username", username)
-    this.socket.emit(NEW_USER, this.state.sender, (data)=>{
-      if(data){
-        this.setState({
-          loggedIn: true
-        })
+    this.setState({
+      sender: {
+        ...this.state.sender,
+        uuid: uuid,
+        socket_id: socket_id
       }
     })
   }
 
-  setOpponent = (opponent)=>{
+  setUser = (username)=>{
+    this.setter("username", username)
+    const sender = {
+      ...this.state.sender,
+      username: username
+    }
+    this.socket.emit(NEW_USER, sender, (data)=>{
+      if(data){
+        this.setState({
+          loggedIn: true
+        })
+        this.checkOpponent()
+      }
+    })
+  }
+
+  setOpponent = (opponent, gameId)=>{
     if(opponent){
       this.setState({
+        gameId: gameId,
         opponent: {
           ...opponent,
           logo: o_img
@@ -124,40 +158,54 @@ class TikTokToe extends Component{
 
   setMove = (squreId, user)=>{
     this.setState({
-      moves: [...this.state.moves, squreId],
+      gamePass: false
     })
-    this.socket.emit(ON_MOVE, (data)=>{
+    const payload = {
+      your: this.state.sender,
+      opponent: this.state.opponent,
+      move: squreId,
+      gameId: this.state.gameId
+    }
+    this.socket.emit(ON_MOVE, payload, (data)=>{
 
     })
   }
 
   render(){
     return(
-      <div className="row">
-        {!this.state.loggedIn?
-          <div className="col-lg-4">
-            <UserForm
-              setUser={ this.setUser }
-            />
+      <React.Fragment>
+        {this.props.socket_id?
+          <div className="row">
+            {!this.state.loggedIn?
+              <div className="col-lg-4">
+                <UserForm
+                  setUser={ this.setUser }
+                />
+              </div>
+            :
+              <React.Fragment>
+                <div className="col-lg-4">
+                  <Container
+                    setMove={ this.setMove }
+                    sender={ this.state.sender }
+                    opponent={ this.state.opponent }
+                    gamePass={ this.state.gamePass }
+                    gameHistory={ this.state.gameHistory }
+                    userLeft={ this.state.userLeft }
+                  />
+                </div>
+                <div className="col-lg-4">
+                  <Detail
+                    gameHistory={ this.state.gameHistory }
+                    onlineUsers={ this.state.onlineUsers }
+                  />
+                </div>
+              </React.Fragment>
+            }
           </div>
-        :
-          <React.Fragment>
-            <div className="col-lg-4">
-              <Container
-                setMove={ this.setMove }
-                sender={ this.state.sender }
-                moves={ this.state.moves }
-                gamePass={ this.state.gamePass }
-              />
-            </div>
-            <div className="col-lg-4">
-              <Detail
-                gameHistory={ this.state.gameHistory }
-              />
-            </div>
-          </React.Fragment>
-        }
-      </div>
+        :null}
+      </React.Fragment>
+
     )
   }
 }

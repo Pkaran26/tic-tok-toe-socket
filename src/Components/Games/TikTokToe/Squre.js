@@ -6,7 +6,7 @@ const Squre = ({ returnFunc, user, squreId, moves, gamePass })=>{
   const [clicked, setClicked] = useState(false)
   const [logo, setLogo] = useState('')
   useEffect(()=>{
-    if(moves.includes(squreId) && !clicked){
+    if(moves && moves.includes(squreId) && !clicked){
       setClicked(true)
       setLogo(o_img)
     }
