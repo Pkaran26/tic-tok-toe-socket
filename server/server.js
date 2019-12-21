@@ -183,10 +183,13 @@ io.sockets.on('connection', function(socket){
       let match = [];
       let possible = possibleCombinations[i];
       for(let j = 0; j < moves.length; j++){
-        if(possible[j] == parseInt(moves[j])){
-          match.push(possible[j])
+        for(let k = 0; k < possible.length; k++){
+          if(possible[k] == parseInt(moves[j])){
+            match.push(possible[k])
+          }
         }
       }
+      console.log(match)
       if(match.length == 3){
         return true
         break;
