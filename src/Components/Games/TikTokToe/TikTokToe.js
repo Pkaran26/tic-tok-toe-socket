@@ -83,16 +83,18 @@ class TikTokToe extends Component{
         console.log(data);
         if(data && data.reset){
           this.setState({
-            winner: data.status,
+            winner: data,
             gameId: '',
             opponent: '',
-            gameHistory: [],
-            moves: [],
             gamePass: false,
             onlineUsers: 0,
             userLeft: ''
           })
           setTimeout(()=>{
+            this.setState({
+              gameHistory: [],
+              moves: [],
+            })
             console.log('matching started');
             this.checkOpponent()
           }, 2000);

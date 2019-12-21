@@ -12,25 +12,6 @@ availableUsers = [];
 connections = [];
 busyUsers = [];
 
-// user: {
-//   uuid: '',
-//   username: '',
-//   socket_id: '',
-//   moves: []
-// }
-//
-// [
-//   {
-//     player1: user1,
-//     player2: user2,
-//     gameHistory: {
-//       history: [],
-//       moves: []
-//     },
-//     moveToken: player1.uuid
-//   }
-// ]
-
 server.listen(process.env.PORT || 3005);
 console.log('running...');
 
@@ -151,17 +132,13 @@ io.sockets.on('connection', function(socket){
       const status = checkWinner(busyUsers[data.gameId][player].moves)
       if(status){
         io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
-          status: {
-            message: 'YOU WON',
-            won: true
-          },
+          message: 'YOU WON',
+          won: true,
           reset: true
         });
         io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
-          status: {
-            message: `YOU LOSE`,
-            won: false
-          },
+          message: `YOU LOSE`,
+          won: false,
           reset: true
         });
         return null;

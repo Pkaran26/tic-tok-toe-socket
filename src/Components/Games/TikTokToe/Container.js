@@ -1,7 +1,7 @@
 import React from 'react'
 import Squre from './Squre'
 
-const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent, userLeft, winner: { won, message } })=>{
+const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent, userLeft, winner: { won, message, reset } })=>{
   return(
     <div className="card bg-light">
       <div className="card-body">
@@ -31,6 +31,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -38,6 +39,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -45,6 +47,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
           </tr>
           <tr>
@@ -54,6 +57,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -61,6 +65,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -68,6 +73,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
           </tr>
           <tr>
@@ -77,6 +83,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -84,6 +91,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
             <Squre
               returnFunc={ setMove }
@@ -91,6 +99,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
               user={ sender }
               moves={ moves }
               gamePass={ gamePass }
+              reset={ reset }
             />
           </tr>
         </tbody>
