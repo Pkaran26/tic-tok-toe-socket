@@ -47,15 +47,15 @@ class TikTokToe extends Component{
   componentDidMount(){
     this.setSender()
     if(this.socket){
-      this.socket.on('ONLINE_USERS', (data)=>{
+      this.socket.on(ONLINE_USERS, (data)=>{
         this.setState({
           onlineUsers: data
         })
       })
-      this.socket.on('AVAIABLE_USERS', (data)=>{
+      this.socket.on(AVAIABLE_USERS, (data)=>{
 
       })
-      this.socket.on('OPPONENT_LEFT', (data)=>{
+      this.socket.on(OPPONENT_LEFT, (data)=>{
         console.log(data.message);
         this.setState({
           userLeft: data.message,
@@ -63,23 +63,23 @@ class TikTokToe extends Component{
           winner: ''
         })
       })
-      this.socket.on('OPPONENT_MATCHED', (data)=>{
+      this.socket.on(OPPONENT_MATCHED, (data)=>{
         if(data && data.status && !this.state.opponent){
           this.setOpponent(data.opponent, data.gameId)
         }
       })
-      this.socket.on('GAME_HISTORY', (data)=>{
+      this.socket.on(GAME_HISTORY, (data)=>{
         this.setState({
           gameHistory: data.gameHistory,
           moves: data.moves
         })
       })
-      this.socket.on('MOVE_TOKEN', (data)=>{
+      this.socket.on(MOVE_TOKEN, (data)=>{
         this.setState({
           gamePass: data.moveToken
         })
       })
-      this.socket.on('GAME_WINNER', (data)=>{
+      this.socket.on(GAME_WINNER, (data)=>{
         console.log(data);
         if(data && data.reset){
           this.setState({

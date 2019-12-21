@@ -13,7 +13,7 @@ const Squre = ({ returnFunc, user, squreId, moves, gamePass, reset })=>{
       setClicked(false)
       setLogo('')
     }
-  }, [moves])
+  }, [moves, squreId, reset])
 
   const addMove = ()=>{
     if(gamePass){
