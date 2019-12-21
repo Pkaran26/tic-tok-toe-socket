@@ -138,13 +138,6 @@ io.sockets.on('connection', function(socket){
     }
   })
 
-  // {
-  //   your: user,
-  //   opponent: user,
-  //   move: move,
-  //  gameId: gameId
-  // }
-
   socket.on('ON_MOVE', function(data){
     busyUsers[data.gameId].gameHistory.history.push({
       username: data.your.username,
@@ -153,23 +146,25 @@ io.sockets.on('connection', function(socket){
     const player = checkPlayer(busyUsers[data.gameId], data.your.uuid)
     busyUsers[data.gameId][player].moves.push(data.move);
     busyUsers[data.gameId].gameHistory.moves.push(data.move);
-    const status = checkWinner(busyUsers[data.gameId][player])
-  //  console.log(status);
-    // if(checkMoves(busyUsers[data.gameId], data.your.uuid)){
-    //   io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
-    //     message: 'you won',
-    //     reset: true
-    //   });
-    //   io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
-    //     message: `${ data.your.username } won`,
-    //     reset: true
-    //   });
-    //   return null;
-    // }else {
-      io.to(`${data.opponent.socket_id}`).emit('MOVE_TOKEN', {
-        moveToken: true
-      });
-  // }
+
+    if(busyUsers[data.gameId][player].moves.length > 2){
+      const status = checkWinner(busyUsers[data.gameId][player])
+      if(status){
+        io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
+          message: 'you won',
+          reset: true
+        });
+        io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
+          message: `${ data.your.username } won`,
+          reset: true
+        });
+        return null;
+      }
+    }
+
+    io.to(`${data.opponent.socket_id}`).emit('MOVE_TOKEN', {
+      moveToken: true
+    });
 
     io.to(`${data.opponent.socket_id}`).emit('GAME_HISTORY', {
       gameHistory: busyUsers[data.gameId].gameHistory,
@@ -186,7 +181,6 @@ io.sockets.on('connection', function(socket){
     }else if(obj.player2.uuid == uuid){
       return 'player2'
     }
-    //flg = checkWinner(obj.player1)
     return flg
   }
 
