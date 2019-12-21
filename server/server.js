@@ -70,7 +70,6 @@ io.sockets.on('connection', function(socket){
   }
 
   function freeUser(user){
-    console.log("user ", user.username, "socket_id", user.socket_id);
     const message = {
       message: 'opponent left'
     }
@@ -89,10 +88,18 @@ io.sockets.on('connection', function(socket){
     io.sockets.emit('ONLINE_USERS', connections.length);
   }
 
+  function filterBusyUsers(user){
+    const filterUsers = busyUsers.filter((e, i)=>{
+      return e.socket_id != user.socket_id
+    })
+    return filterUsers
+  }
+
   socket.on('CHECK_OPPONENT', function(user, callback){
     const opponent = availableUsers.filter((e, i)=>{
       return e.socket_id != user.socket_id
     })
+
     if(opponent && opponent.length>0){
       const payload = {
         player1: user,
@@ -103,24 +110,26 @@ io.sockets.on('connection', function(socket){
         },
         moveToken: user.uuid
       }
-      busyUsers.push(payload)
-      const gameId = busyUsers.indexOf(payload)
-
-      const player1 = {
-        status: true,
-        message: 'success',
-        opponent: user,
-        gameId: gameId
+      const filterUsers = filterBusyUsers(user)
+      if(filterUsers && filterUsers.length == 0){
+        busyUsers.push(payload)
+        const gameId = busyUsers.indexOf(payload)
+        const player1 = {
+          status: true,
+          message: 'success',
+          opponent: user,
+          gameId: gameId
+        }
+        io.to(`${opponent[0].socket_id}`).emit('OPPONENT_MATCHED', player1);
+        const player2 = {
+          status: true,
+          message: 'success',
+          opponent: opponent[0],
+          gameId: gameId,
+          moveToken: true
+        }
+        callback(player2)
       }
-      io.to(`${opponent[0].socket_id}`).emit('OPPONENT_MATCHED', player1);
-      const player2 = {
-        status: true,
-        message: 'success',
-        opponent: opponent[0],
-        gameId: gameId,
-        moveToken: true
-      }
-      callback(player2)
     }else{
       callback({
         status: false,
@@ -141,12 +150,11 @@ io.sockets.on('connection', function(socket){
       username: data.your.username,
       move: data.move
     })
-    //console.log(busyUsers[data.gameId]);
     const player = checkPlayer(busyUsers[data.gameId], data.your.uuid)
     busyUsers[data.gameId][player].moves.push(data.move);
     busyUsers[data.gameId].gameHistory.moves.push(data.move);
     const status = checkWinner(busyUsers[data.gameId][player])
-    console.log(status);
+  //  console.log(status);
     // if(checkMoves(busyUsers[data.gameId], data.your.uuid)){
     //   io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
     //     message: 'you won',

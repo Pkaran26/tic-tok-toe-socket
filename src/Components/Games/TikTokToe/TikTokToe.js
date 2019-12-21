@@ -43,10 +43,6 @@ class TikTokToe extends Component{
     })
   }
 
-  // componentWillMount(){
-  //   this.setSender()
-  // }
-
   componentDidMount(){
     this.setSender()
     if(this.socket){
@@ -95,7 +91,9 @@ class TikTokToe extends Component{
           gamePass: true
         })
       }else {
-        this.checkOpponent()
+        if(!this.state.gamePass && !this.state.opponent){
+          this.checkOpponent()
+        }
       }
     })
   }
