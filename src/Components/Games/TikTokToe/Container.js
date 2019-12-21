@@ -1,7 +1,7 @@
 import React from 'react'
 import Squre from './Squre'
 
-const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent, userLeft })=>{
+const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent, userLeft, winner: { won, message } })=>{
   return(
     <div className="card bg-light">
       <div className="card-body">
@@ -21,6 +21,7 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
             </tr>
           </tbody>
         </table>
+        <hr/>
         <table>
           <tbody>
           <tr>
@@ -95,6 +96,11 @@ const Container = ({ setMove, sender, gameHistory: { moves }, gamePass, opponent
         </tbody>
         </table>
       </div>
+      {message?
+        <div className={`card-footer ${ won? `bg-success` : `bg-danger` } text-white`}>
+          <h4 className="card-title">{ message }</h4>
+        </div>
+      :null}
     </div>
   )
 }

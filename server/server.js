@@ -148,14 +148,20 @@ io.sockets.on('connection', function(socket){
     busyUsers[data.gameId].gameHistory.moves.push(data.move);
 
     if(busyUsers[data.gameId][player].moves.length > 2){
-      const status = checkWinner(busyUsers[data.gameId][player])
+      const status = checkWinner(busyUsers[data.gameId][player].moves)
       if(status){
         io.to(`${data.your.socket_id}`).emit('GAME_WINNER', {
-          message: 'you won',
+          status: {
+            message: 'YOU WON',
+            won: true
+          },
           reset: true
         });
         io.to(`${data.opponent.socket_id}`).emit('GAME_WINNER', {
-          message: `${ data.your.username } won`,
+          status: {
+            message: `YOU LOSE`,
+            won: false
+          },
           reset: true
         });
         return null;
@@ -184,7 +190,7 @@ io.sockets.on('connection', function(socket){
     return flg
   }
 
-  function checkWinner(user){
+  function checkWinner(moves){
     const possibleCombinations = [
       [ 0,1,2 ],
       [ 3,4,5 ],
@@ -196,24 +202,19 @@ io.sockets.on('connection', function(socket){
       [ 2,4,6 ]
     ];
 
-    const moves = user.moves.sort();
-    console.log(moves);
     for(let i = 0; i < possibleCombinations.length; i++){
       let match = [];
       let possible = possibleCombinations[i];
-
-      if(possible[0] in moves || possible[1] in moves || possible[2] in moves){
-        for(let j = 0; j < moves.length; j++){
-          try{
-            if(possible[0] == moves[j] && possible[0] == moves[j+1] && possible[0] == moves[j+2]){
-              return true
-              break;
-            }
-          }catch(e){
-            return false
-          }
+      for(let j = 0; j < moves.length; j++){
+        if(possible[j] == parseInt(moves[j])){
+          match.push(possible[j])
         }
       }
+      if(match.length == 3){
+        return true
+        break;
+      }
+      match = []
     }
     return false
   }

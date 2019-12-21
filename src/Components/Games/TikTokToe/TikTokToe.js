@@ -29,7 +29,8 @@ class TikTokToe extends Component{
       moves: [],
       gamePass: false,
       onlineUsers: 0,
-      userLeft: ''
+      userLeft: '',
+      winner: ''
     }
     this.socket = null
   }
@@ -58,7 +59,8 @@ class TikTokToe extends Component{
         console.log(data.message);
         this.setState({
           userLeft: data.message,
-          opponent: ''
+          opponent: '',
+          winner: ''
         })
       })
       this.socket.on('OPPONENT_MATCHED', (data)=>{
@@ -79,6 +81,22 @@ class TikTokToe extends Component{
       })
       this.socket.on('GAME_WINNER', (data)=>{
         console.log(data);
+        if(data && data.reset){
+          this.setState({
+            winner: data.status,
+            gameId: '',
+            opponent: '',
+            gameHistory: [],
+            moves: [],
+            gamePass: false,
+            onlineUsers: 0,
+            userLeft: ''
+          })
+          setTimeout(()=>{
+            console.log('matching started');
+            this.checkOpponent()
+          }, 2000);
+        }
       })
     }
   }
@@ -88,7 +106,9 @@ class TikTokToe extends Component{
       if(data && data.status && !this.state.opponent){
         this.setOpponent(data.opponent, data.gameId)
         this.setState({
-          gamePass: true
+          gamePass: true,
+          userLeft: '',
+          winner: ''
         })
       }else {
         if(!this.state.gamePass && !this.state.opponent){
@@ -190,6 +210,7 @@ class TikTokToe extends Component{
                     gamePass={ this.state.gamePass }
                     gameHistory={ this.state.gameHistory }
                     userLeft={ this.state.userLeft }
+                    winner={ this.state.winner }
                   />
                 </div>
                 <div className="col-lg-4">
